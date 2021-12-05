@@ -29,7 +29,6 @@ public class Sprite {
     public Image getImage() {
         return this.image;
     }
-
     public int getX() {
         return this.x;
     }
@@ -39,7 +38,12 @@ public class Sprite {
     public boolean isVisible() {
         return this.visible;
     }
+
     public void setVisible(boolean visible) {
         this.visible = visible;
+    }
+
+    public Rectangle getBounds() {
+        return new Rectangle(this.x, this.y, this.width, this.height);
     }
 }

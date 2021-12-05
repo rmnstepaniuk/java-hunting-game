@@ -1,5 +1,7 @@
 package huntingGame.sprites;
 
+import huntingGame.Main;
+
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,26 +13,60 @@ public class Player extends Sprite {
     private int dx, dy;
     private List<Bullet> bullets;
     private int directionCode;
-    private int ammo = 10;
+    private int ammo;
+    private int score;
 
     public Player(int x, int y) {
         super(x, y);
-
+        score = 0;
         initPlayer();
     }
 
     private void initPlayer() {
+        ammo = 10;
         bullets = new ArrayList<>();
         loadImage("res/player.png");
         getImageDimensions();
     }
+
+    public List<Bullet> getBullets() {
+        return bullets;
+    }
+
+    public int getAmmo() {
+        return this.ammo;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
     public void move() {
+        if (x == 0 || x == Main.SCREEN_WIDTH || y == 0 || y == Main.SCREEN_HEIGHT) {
+            setVisible(false);
+        }
         x += dx;
         y += dy;
     }
 
-    public List<Bullet> getBullets() {
-        return bullets;
+    private void fire() {
+        if (ammo > 0) {
+            bullets.add(new Bullet(x + dx, y + dy, this.directionCode));
+            ammo--;
+            try {
+                sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            System.out.println("Out of ammo");
+        }
+
     }
 
     public void keyPressed(KeyEvent event) {
@@ -55,22 +91,6 @@ public class Player extends Sprite {
             this.directionCode = 2;
             dy = 1;
         }
-    }
-
-    private void fire() {
-        if (ammo > 0) {
-            bullets.add(new Bullet(x + dx, y + dy, this.directionCode));
-            ammo--;
-            try {
-                sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        else {
-            System.out.println("Out of ammo");
-        }
-
     }
 
     public void keyReleased(KeyEvent event) {
