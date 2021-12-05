@@ -4,7 +4,8 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 
 public class Main extends JFrame {
-
+    public static final int SCREEN_WIDTH = 768;
+    public static final int SCREEN_HEIGHT = 384;
     public Main() {
         initUI();
     }
@@ -13,7 +14,7 @@ public class Main extends JFrame {
         add(new Panel());
 
         setTitle("Hunting game");
-        setSize(1024, 768);
+        setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
         setLocationRelativeTo(null);
         setResizable(false);
