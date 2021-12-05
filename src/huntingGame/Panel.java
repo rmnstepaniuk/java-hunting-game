@@ -17,6 +17,8 @@ public class Panel extends JPanel implements ActionListener {
     Timer timer;
     private Player player;
     private List<Wolf> wolves;
+    private List<Hare> hares;
+    private List<Entity> entities;
     private boolean inGame;
     private final Random random = new Random();
 
@@ -41,9 +43,15 @@ public class Panel extends JPanel implements ActionListener {
 
     private void initEntities() {
         wolves = new ArrayList<>();
-
+        hares = new ArrayList<>();
+        entities = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             wolves.add(new Wolf(random.nextInt(Main.SCREEN_WIDTH), random.nextInt(Main.SCREEN_HEIGHT)));
+            hares.add(new Hare(random.nextInt(Main.SCREEN_WIDTH), random.nextInt(Main.SCREEN_HEIGHT)));
+        }
+        for (int i = 0; i < 5; i++) {
+            entities.add(wolves.get(i));
+            entities.add(hares.get(i));
         }
     }
 
@@ -87,6 +95,11 @@ public class Panel extends JPanel implements ActionListener {
                 g2d.drawImage(wolf.getImage(), wolf.getX(), wolf.getY(), this);
             }
         }
+        for (Hare hare : hares) {
+            if (hare.isVisible()) {
+                g2d.drawImage(hare.getImage(), hare.getX(), hare.getY(), this);
+            }
+        }
         g2d.setColor(Color.white);
         g2d.drawString("Ammo left: " + player.getAmmo(), Main.SCREEN_WIDTH / 2, 10);
         g2d.drawString("Score: " + player.getScore(), Main.SCREEN_WIDTH / 2, 20);
@@ -116,6 +129,7 @@ public class Panel extends JPanel implements ActionListener {
     private void checkCollision() {
         Rectangle playerHitBox = player.getBounds();
         Rectangle wolfHitBox;
+        Rectangle hareHitBox;
         Rectangle bulletHitBox;
 
         for (Wolf wolf : wolves) {
@@ -127,8 +141,20 @@ public class Panel extends JPanel implements ActionListener {
                 return;
             }
             else if (playerHitBox.intersects(wolfHitBox) && !(wolf.isAlive())) {
-                player.setScore(player.getScore() + 1);
+                player.setScore(player.getScore() + 10);
                 wolf.setVisible(false);
+            }
+        }
+        for (Hare hare : hares) {
+            hareHitBox = hare.getBounds();
+
+            if (playerHitBox.intersects(hareHitBox) && hare.isAlive()) {
+                hare.setAlive(false);
+                hare.loadImage("res/hareDead.png");
+            }
+            else if (playerHitBox.intersects(hareHitBox) && !(hare.isAlive())) {
+                player.setScore(player.getScore() + 1);
+                hare.setVisible(false);
             }
         }
         List<Bullet> bullets = player.getBullets();
@@ -145,11 +171,21 @@ public class Panel extends JPanel implements ActionListener {
                     wolf.loadImage("res/wolfDead.png");
                 }
             }
+            for (Hare hare : hares) {
+                hareHitBox = hare.getBounds();
+
+                if (bulletHitBox.intersects(hareHitBox)) {
+                    bullet.setVisible(false);
+                    hare.setAlive(false);
+                    hare.loadImage("res/hareDead.png");
+                }
+            }
         }
     }
 
     private void updateEntities() {
         Wolf wolf;
+        Hare hare;
         for (int i = 0; i < wolves.size(); i++) {
             wolf = wolves.get(i);
             if (wolf.isAlive()) {
@@ -160,6 +196,17 @@ public class Panel extends JPanel implements ActionListener {
                 wolves.remove(i);
             }
         }
+        for (int i = 0; i < hares.size(); i++) {
+            hare = hares.get(i);
+            if (hare.isAlive()) {
+                hare.move();
+            }
+            else if (hare.isVisible()) {}
+            else {
+                hares.remove(i);
+            }
+        }
+
     }
 
     private void updatePlayer() {
