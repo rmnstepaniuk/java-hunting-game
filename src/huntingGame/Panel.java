@@ -16,8 +16,6 @@ public class Panel extends JPanel implements ActionListener {
 
     Timer timer;
     private Player player;
-    private List<Wolf> wolves;
-    private List<Hare> hares;
     private List<Entity> entities;
     private boolean inGame;
     private final Random random = new Random();
@@ -28,7 +26,7 @@ public class Panel extends JPanel implements ActionListener {
 
     private void initPanel() {
         addKeyListener(new TAdapter());
-        setBackground(Color.black);
+        setBackground(Color.green);
         setFocusable(true);
         inGame = true;
 
@@ -42,16 +40,19 @@ public class Panel extends JPanel implements ActionListener {
     }
 
     private void initEntities() {
-        wolves = new ArrayList<>();
-        hares = new ArrayList<>();
         entities = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            wolves.add(new Wolf(random.nextInt(Main.SCREEN_WIDTH), random.nextInt(Main.SCREEN_HEIGHT)));
-            hares.add(new Hare(random.nextInt(Main.SCREEN_WIDTH), random.nextInt(Main.SCREEN_HEIGHT)));
+
+        int deerPopulation = 0;
+        while (deerPopulation < 3) {
+            deerPopulation = random.nextInt(10);
         }
+
         for (int i = 0; i < 5; i++) {
-            entities.add(wolves.get(i));
-            entities.add(hares.get(i));
+            entities.add(new Wolf(random.nextInt(Main.SCREEN_WIDTH), random.nextInt(Main.SCREEN_HEIGHT)));
+            entities.add(new Hare(random.nextInt(Main.SCREEN_WIDTH), random.nextInt(Main.SCREEN_HEIGHT)));
+        }
+        for (int i = 0; i < deerPopulation; i++) {
+            entities.add(new Deer(random.nextInt(Main.SCREEN_WIDTH), random.nextInt(Main.SCREEN_HEIGHT)));
         }
     }
 
@@ -72,12 +73,15 @@ public class Panel extends JPanel implements ActionListener {
     private void drawGameOver(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         String gameOverMessage = "GAME OVER";
+        String scoreMessage = "Your score is: " + player.getScore();
+
         Font font = new Font("Helvetica", Font.BOLD, 20);
         FontMetrics fontMetrics = getFontMetrics(font);
 
         g2d.setColor(Color.white);
         g2d.setFont(font);
-        g2d.drawString(gameOverMessage, (Main.SCREEN_WIDTH - fontMetrics.stringWidth(gameOverMessage)) / 2, Main.SCREEN_HEIGHT / 2);
+        g2d.drawString(gameOverMessage, (Main.SCREEN_WIDTH - fontMetrics.stringWidth(gameOverMessage)) / 2, Main.SCREEN_HEIGHT / 2 - 20);
+        g2d.drawString(scoreMessage, (Main.SCREEN_WIDTH - fontMetrics.stringWidth(scoreMessage)) / 2, Main.SCREEN_HEIGHT / 2 + 20);
     }
 
     private void drawGame(Graphics g) {
@@ -90,16 +94,12 @@ public class Panel extends JPanel implements ActionListener {
             g2d.drawImage(bullet.getImage(), bullet.getX(), bullet.getY(), this);
         }
         g2d.setColor(Color.white);
-        for (Wolf wolf : wolves) {
-            if (wolf.isVisible()) {
-                g2d.drawImage(wolf.getImage(), wolf.getX(), wolf.getY(), this);
+        for (Entity entity : entities) {
+            if (entity.isVisible()) {
+                g2d.drawImage(entity.getImage(), entity.getX(), entity.getY(), this);
             }
         }
-        for (Hare hare : hares) {
-            if (hare.isVisible()) {
-                g2d.drawImage(hare.getImage(), hare.getX(), hare.getY(), this);
-            }
-        }
+
         g2d.setColor(Color.white);
         g2d.drawString("Ammo left: " + player.getAmmo(), Main.SCREEN_WIDTH / 2, 10);
         g2d.drawString("Score: " + player.getScore(), Main.SCREEN_WIDTH / 2, 20);
@@ -128,85 +128,76 @@ public class Panel extends JPanel implements ActionListener {
 
     private void checkCollision() {
         Rectangle playerHitBox = player.getBounds();
-        Rectangle wolfHitBox;
-        Rectangle hareHitBox;
+        Rectangle entityHitBox;
         Rectangle bulletHitBox;
 
-        for (Wolf wolf : wolves) {
-            wolfHitBox = wolf.getBounds();
-
-            if (playerHitBox.intersects(wolfHitBox) && wolf.isAlive()) {
-                player.setVisible(false);
-                inGame = false;
-                return;
-            }
-            else if (playerHitBox.intersects(wolfHitBox) && !(wolf.isAlive())) {
-                player.setScore(player.getScore() + 10);
-                wolf.setVisible(false);
-            }
-        }
-        for (Hare hare : hares) {
-            hareHitBox = hare.getBounds();
-
-            if (playerHitBox.intersects(hareHitBox) && hare.isAlive()) {
-                hare.setAlive(false);
-                hare.loadImage("res/hareDead.png");
-            }
-            else if (playerHitBox.intersects(hareHitBox) && !(hare.isAlive())) {
-                player.setScore(player.getScore() + 1);
-                hare.setVisible(false);
-            }
-        }
-        List<Bullet> bullets = player.getBullets();
-
-        for (Bullet bullet : bullets) {
-            bulletHitBox = bullet.getBounds();
-
-            for (Wolf wolf : wolves) {
-                wolfHitBox = wolf.getBounds();
-
-                if (bulletHitBox.intersects(wolfHitBox)) {
-                    bullet.setVisible(false);
-                    wolf.setAlive(false);
-                    wolf.loadImage("res/wolfDead.png");
+        for (Entity entity : entities) {
+            entityHitBox = entity.getBounds();
+            if (playerHitBox.intersects(entityHitBox) && entity.isAlive()) {
+                if (entity instanceof Hare) {
+                    entity.setAlive(false);
+                    entity.loadImage("res/entities/hareDead.png");
+                }
+                else {
+                    player.setVisible(false);
+                    inGame = false;
+                    return;
                 }
             }
-            for (Hare hare : hares) {
-                hareHitBox = hare.getBounds();
+            else if (playerHitBox.intersects(entityHitBox) && !entity.isAlive()) {
+                entity.setVisible(false);
+                if (entity instanceof Wolf) {
+                    player.updateScore(10);
+                }
+                if (entity instanceof Deer) {
+                    player.updateScore(5);
+                }
+                if (entity instanceof Hare) {
+                    player.updateScore(1);
+                }
+            }
+        }
 
-                if (bulletHitBox.intersects(hareHitBox)) {
+        List<Bullet> bullets = player.getBullets();
+        for (Bullet bullet : bullets) {
+            bulletHitBox = bullet.getBounds();
+            for (Entity entity : entities) {
+                entityHitBox = entity.getBounds();
+
+                if (bulletHitBox.intersects(entityHitBox)) {
                     bullet.setVisible(false);
-                    hare.setAlive(false);
-                    hare.loadImage("res/hareDead.png");
+                    entity.setAlive(false);
+                    if (entity instanceof Wolf) {
+                        entity.loadImage("res/entities/wolfDead.png");
+                    }
+                    if (entity instanceof Hare) {
+                        entity.loadImage("res/entities/hareDead.png");
+                    }
+                    if (entity instanceof Deer) {
+                        entity.loadImage("res/entities/deerDead.png");
+                    }
                 }
             }
         }
     }
 
     private void updateEntities() {
-        Wolf wolf;
-        Hare hare;
-        for (int i = 0; i < wolves.size(); i++) {
-            wolf = wolves.get(i);
-            if (wolf.isAlive()) {
-                wolf.move();
-            }
-            else if (wolf.isVisible()) {}
-            else {
-                wolves.remove(i);
+        Entity entity;
+        if (entities.size() == 0) {
+            inGame = false;
+            return;
+        }
+        else {
+            for (int i = 0; i < entities.size(); i++) {
+                entity = entities.get(i);
+                if (entity.isAlive()) {
+                    entity.move();
+                }
+                if (!entity.isVisible()) {
+                    entities.remove(i);
+                }
             }
         }
-        for (int i = 0; i < hares.size(); i++) {
-            hare = hares.get(i);
-            if (hare.isAlive()) {
-                hare.move();
-            }
-            else if (hare.isVisible()) {}
-            else {
-                hares.remove(i);
-            }
-        }
-
     }
 
     private void updatePlayer() {

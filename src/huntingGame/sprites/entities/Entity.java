@@ -1,5 +1,7 @@
 package huntingGame.sprites.entities;
 
+import huntingGame.Main;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -57,5 +59,11 @@ public class Entity {
 
     public Rectangle getBounds() {
         return new Rectangle(this.x, this.y, this.width, this.height);
+    }
+
+    public void move() {
+        if (x == 0 || x == Main.SCREEN_WIDTH || y == 0 || y == Main.SCREEN_HEIGHT) {
+            setVisible(false);
+        }
     }
 }

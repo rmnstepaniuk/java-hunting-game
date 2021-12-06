@@ -41,8 +41,8 @@ public class Player extends Sprite {
         return score;
     }
 
-    public void setScore(int score) {
-        this.score = score;
+    public void updateScore(int score) {
+        this.score += score;
     }
 
     public void move() {

@@ -10,7 +10,7 @@ public class Wolf extends Entity {
     }
 
     private void initWolf() {
-        loadImage("res/wolf.png");
+        loadImage("res/entities/wolf.png");
         getImageDimensions();
     }
 

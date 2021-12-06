@@ -10,7 +10,7 @@ public class Hare extends Entity {
     }
 
     private void initHare() {
-        loadImage("res/hare.png");
+        loadImage("res/entities/hare.png");
         getImageDimensions();
     }
 
