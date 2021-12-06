@@ -2,15 +2,15 @@ package huntingGame.sprites.entities;
 
 import huntingGame.Main;
 
-public class Wolf extends Entity {
+public class Hare extends Entity {
 
-    public Wolf(int x, int y) {
+    public Hare(int x, int y) {
         super(x, y);
-        initWolf();
+        initHare();
     }
 
-    private void initWolf() {
-        loadImage("res/entities/wolf.png");
+    private void initHare() {
+        loadImage("res/entities/hare.png");
         getImageDimensions();
     }
 
