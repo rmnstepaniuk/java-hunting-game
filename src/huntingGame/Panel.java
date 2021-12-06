@@ -41,19 +41,15 @@ public class Panel extends JPanel implements ActionListener {
 
     private void initEntities() {
         entities = new ArrayList<>();
-
+        for (int i = 0; i < 5; i++) {
+            entities.add(Spawner.spawnWolf());
+            entities.add(Spawner.spawnHare());
+        }
         int deerPopulation = 0;
         while (deerPopulation < 3) {
             deerPopulation = random.nextInt(10);
         }
-
-        for (int i = 0; i < 5; i++) {
-            entities.add(new Wolf(random.nextInt(Main.SCREEN_WIDTH), random.nextInt(Main.SCREEN_HEIGHT)));
-            entities.add(new Hare(random.nextInt(Main.SCREEN_WIDTH), random.nextInt(Main.SCREEN_HEIGHT)));
-        }
-        for (int i = 0; i < deerPopulation; i++) {
-            entities.add(new Deer(random.nextInt(Main.SCREEN_WIDTH), random.nextInt(Main.SCREEN_HEIGHT)));
-        }
+        entities.addAll(Spawner.spawnDeer(deerPopulation));
     }
 
     @Override
