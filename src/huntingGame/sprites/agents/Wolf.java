@@ -1,8 +1,8 @@
-package huntingGame.sprites.entities;
+package huntingGame.sprites.agents;
 
 import huntingGame.Main;
 
-public class Wolf extends Entity {
+public class Wolf extends Agent {
 
     public Wolf(int x, int y) {
         super(x, y);
@@ -15,8 +15,6 @@ public class Wolf extends Entity {
     }
 
     public void move() {
-        if (x == 0 || x == Main.SCREEN_WIDTH || y == 0 || y == Main.SCREEN_HEIGHT) {
-            setVisible(false);
-        }
+        
     }
 }

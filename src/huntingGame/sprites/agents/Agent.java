@@ -1,29 +1,31 @@
-package huntingGame.sprites.entities;
+package huntingGame.sprites.agents;
 
 import huntingGame.Main;
 
 import javax.swing.*;
+import javax.vecmath.Vector2d;
 import java.awt.*;
 
-public class Entity {
-    protected int x, y;
+public class Agent {
+//    protected int x, y;
+    protected Vector2d location = new Vector2d();
     protected int width, height;
     protected boolean visible;
     protected boolean alive;
     protected Image image;
 
-    public Entity(int x, int y) {
-        this.x = x;
-        this.y = y;
+    public Agent(int x, int y) {
+        this.location.x = x;
+        this.location.y = y;
         visible = true;
         alive = true;
     }
 
     public int getX() {
-        return this.x;
+        return (int) this.location.x;
     }
     public int getY() {
-        return this.y;
+        return (int) this.location.y;
     }
     public int getWidth() {
         return this.width;
@@ -58,12 +60,10 @@ public class Entity {
     }
 
     public Rectangle getBounds() {
-        return new Rectangle(this.x, this.y, this.width, this.height);
+        return new Rectangle((int)this.location.x, (int) this.location.y, this.width, this.height);
     }
 
     public void move() {
-        if (x == 0 || x == Main.SCREEN_WIDTH || y == 0 || y == Main.SCREEN_HEIGHT) {
-            setVisible(false);
-        }
+
     }
 }

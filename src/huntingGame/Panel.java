@@ -1,7 +1,7 @@
 package huntingGame;
 
 import huntingGame.sprites.*;
-import huntingGame.sprites.entities.*;
+import huntingGame.sprites.agents.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -16,7 +16,7 @@ public class Panel extends JPanel implements ActionListener {
 
     Timer timer;
     private Player player;
-    private List<Entity> entities;
+    private List<Agent> agents;
     private boolean inGame;
     private final Random random = new Random();
 
@@ -26,7 +26,7 @@ public class Panel extends JPanel implements ActionListener {
 
     private void initPanel() {
         addKeyListener(new TAdapter());
-        setBackground(Color.green);
+        setBackground(Color.black);
         setFocusable(true);
         inGame = true;
 
@@ -40,16 +40,16 @@ public class Panel extends JPanel implements ActionListener {
     }
 
     private void initEntities() {
-        entities = new ArrayList<>();
+        agents = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            entities.add(Spawner.spawnWolf());
-            entities.add(Spawner.spawnHare());
+            agents.add(Spawner.spawnWolf());
+            agents.add(Spawner.spawnHare());
         }
         int deerPopulation = 0;
         while (deerPopulation < 3) {
             deerPopulation = random.nextInt(10);
         }
-        entities.addAll(Spawner.spawnDeer(deerPopulation));
+        agents.addAll(Spawner.spawnDeer(deerPopulation));
     }
 
     @Override
@@ -90,9 +90,9 @@ public class Panel extends JPanel implements ActionListener {
             g2d.drawImage(bullet.getImage(), bullet.getX(), bullet.getY(), this);
         }
         g2d.setColor(Color.white);
-        for (Entity entity : entities) {
-            if (entity.isVisible()) {
-                g2d.drawImage(entity.getImage(), entity.getX(), entity.getY(), this);
+        for (Agent agent : agents) {
+            if (agent.isVisible()) {
+                g2d.drawImage(agent.getImage(), agent.getX(), agent.getY(), this);
             }
         }
 
@@ -127,12 +127,12 @@ public class Panel extends JPanel implements ActionListener {
         Rectangle entityHitBox;
         Rectangle bulletHitBox;
 
-        for (Entity entity : entities) {
-            entityHitBox = entity.getBounds();
-            if (playerHitBox.intersects(entityHitBox) && entity.isAlive()) {
-                if (entity instanceof Hare) {
-                    entity.setAlive(false);
-                    entity.loadImage("res/entities/hareDead.png");
+        for (Agent agent : agents) {
+            entityHitBox = agent.getBounds();
+            if (playerHitBox.intersects(entityHitBox) && agent.isAlive()) {
+                if (agent instanceof Hare) {
+                    agent.setAlive(false);
+                    agent.loadImage("res/entities/hareDead.png");
                 }
                 else {
                     player.setVisible(false);
@@ -140,15 +140,15 @@ public class Panel extends JPanel implements ActionListener {
                     return;
                 }
             }
-            else if (playerHitBox.intersects(entityHitBox) && !entity.isAlive()) {
-                entity.setVisible(false);
-                if (entity instanceof Wolf) {
+            else if (playerHitBox.intersects(entityHitBox) && !agent.isAlive()) {
+                agent.setVisible(false);
+                if (agent instanceof Wolf) {
                     player.updateScore(10);
                 }
-                if (entity instanceof Deer) {
+                if (agent instanceof Deer) {
                     player.updateScore(5);
                 }
-                if (entity instanceof Hare) {
+                if (agent instanceof Hare) {
                     player.updateScore(1);
                 }
             }
@@ -157,20 +157,20 @@ public class Panel extends JPanel implements ActionListener {
         List<Bullet> bullets = player.getBullets();
         for (Bullet bullet : bullets) {
             bulletHitBox = bullet.getBounds();
-            for (Entity entity : entities) {
-                entityHitBox = entity.getBounds();
+            for (Agent agent : agents) {
+                entityHitBox = agent.getBounds();
 
                 if (bulletHitBox.intersects(entityHitBox)) {
                     bullet.setVisible(false);
-                    entity.setAlive(false);
-                    if (entity instanceof Wolf) {
-                        entity.loadImage("res/entities/wolfDead.png");
+                    agent.setAlive(false);
+                    if (agent instanceof Wolf) {
+                        agent.loadImage("res/entities/wolfDead.png");
                     }
-                    if (entity instanceof Hare) {
-                        entity.loadImage("res/entities/hareDead.png");
+                    if (agent instanceof Hare) {
+                        agent.loadImage("res/entities/hareDead.png");
                     }
-                    if (entity instanceof Deer) {
-                        entity.loadImage("res/entities/deerDead.png");
+                    if (agent instanceof Deer) {
+                        agent.loadImage("res/entities/deerDead.png");
                     }
                 }
             }
@@ -178,19 +178,19 @@ public class Panel extends JPanel implements ActionListener {
     }
 
     private void updateEntities() {
-        Entity entity;
-        if (entities.size() == 0) {
+        Agent agent;
+        if (agents.size() == 0) {
             inGame = false;
             return;
         }
         else {
-            for (int i = 0; i < entities.size(); i++) {
-                entity = entities.get(i);
-                if (entity.isAlive()) {
-                    entity.move();
+            for (int i = 0; i < agents.size(); i++) {
+                agent = agents.get(i);
+                if (agent.isAlive()) {
+                    agent.move();
                 }
-                if (!entity.isVisible()) {
-                    entities.remove(i);
+                if (!agent.isVisible()) {
+                    agents.remove(i);
                 }
             }
         }

@@ -1,8 +1,6 @@
-package huntingGame.sprites.entities;
+package huntingGame.sprites.agents;
 
-import huntingGame.Main;
-
-public class Deer extends Entity {
+public class Deer extends Agent {
 
     public Deer(int x, int y) {
         super(x, y);

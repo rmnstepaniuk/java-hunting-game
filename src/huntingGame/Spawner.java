@@ -1,6 +1,6 @@
 package huntingGame;
 
-import huntingGame.sprites.entities.*;
+import huntingGame.sprites.agents.*;
 
 import java.util.ArrayList;
 import java.util.List;
