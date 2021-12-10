@@ -4,9 +4,7 @@ import huntingGame.Main;
 import huntingGame.sprites.Player;
 import huntingGame.sprites.Sprite;
 
-import javax.swing.*;
 import javax.vecmath.Vector2d;
-import java.awt.*;
 import java.util.ArrayList;
 
 
@@ -51,11 +49,22 @@ public class Agent extends Sprite {
         steerForce.sub(desiredVelocity, velocity);
     }
 
+    public void flee(Vector2d targetPosition) {
+        desiredVelocity.sub(position, targetPosition);
+
+        desiredVelocity.normalize();
+        desiredVelocity.scale(maxSpeed);
+        steerForce.sub(desiredVelocity, velocity);
+    }
+
     public void update(Vector2d targetPosition) {
         chooseBehavior();
         switch (this.behavior) {
             case "SEEK":
                 seek(targetPosition);
+                break;
+            case "FLEE":
+                flee(targetPosition);
                 break;
             default:
                 break;
@@ -91,8 +100,8 @@ public class Agent extends Sprite {
         Vector2d desired = new Vector2d();
         Sprite target = null;
         if (agents.size() == 0) return player;
-        for (int i = 0; i < agents.size(); i++) {
-            agent = agents.get(i);
+        for (Agent value : agents) {
+            agent = value;
             if (!this.equals(agent)) {
                 desired.sub(agent.position, this.position);
                 if (desired.length() < distanceToTarget) {
@@ -110,6 +119,7 @@ public class Agent extends Sprite {
     }
 
     private void chooseBehavior() {
-        this.behavior = "SEEK";
+        if (this instanceof Wolf) this.behavior = "SEEK";
+        if (this instanceof Hare) this.behavior = "FLEE";
     }
 }
