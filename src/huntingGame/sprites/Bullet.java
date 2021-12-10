@@ -24,26 +24,26 @@ public class Bullet extends Sprite {
         int BULLET_DISTANCE = 100;
         switch (bulletDirectionCode) {
             case 8:
-                y -= BULLET_SPEED;
-                if (Math.abs(y - startingY) > BULLET_DISTANCE) {
+                this.position.y -= BULLET_SPEED;
+                if (Math.abs(this.getY() - startingY) > BULLET_DISTANCE) {
                     visible = false;
                 }
                 break;
             case 2:
-                y += BULLET_SPEED;
-                if (Math.abs(y - startingY) > BULLET_DISTANCE) {
+                this.position.y += BULLET_SPEED;
+                if (Math.abs(this.getY() - startingY) > BULLET_DISTANCE) {
                     visible = false;
                 }
                 break;
             case 4:
-                x -= BULLET_SPEED;
-                if (Math.abs(x - startingX) > BULLET_DISTANCE) {
+                this.position.x -= BULLET_SPEED;
+                if (Math.abs(this.getX() - startingX) > BULLET_DISTANCE) {
                     visible = false;
                 }
                 break;
             case 6:
-                x += BULLET_SPEED;
-                if (Math.abs(x - startingX) > BULLET_DISTANCE) {
+                this.position.x += BULLET_SPEED;
+                if (Math.abs(this.getX() - startingX) > BULLET_DISTANCE) {
                     visible = false;
                 }
                 break;

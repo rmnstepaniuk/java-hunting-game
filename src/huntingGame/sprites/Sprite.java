@@ -1,23 +1,24 @@
 package huntingGame.sprites;
 
 import javax.swing.*;
+import javax.vecmath.Vector2d;
 import java.awt.*;
 
 public class Sprite {
 
-    protected int x, y;
+    protected Vector2d position = new Vector2d();
     protected int width, height;
     protected boolean visible;
     protected Image image;
 
     public Sprite(int x, int y) {
-        this.x = x;
-        this.y = y;
+        this.position.x = x;
+        this.position.y = y;
         visible = true;
     }
 
-    protected void loadImage(String ImageName) {
-        ImageIcon ii = new ImageIcon(ImageName);
+    public void loadImage(String ImagePath) {
+        ImageIcon ii = new ImageIcon(ImagePath);
         this.image = ii.getImage();
     }
 
@@ -30,10 +31,13 @@ public class Sprite {
         return this.image;
     }
     public int getX() {
-        return this.x;
+        return (int) this.position.x;
     }
     public int getY() {
-        return this.y;
+        return (int) this.position.y;
+    }
+    public Vector2d getPosition() {
+        return this.position;
     }
     public boolean isVisible() {
         return this.visible;
@@ -44,6 +48,6 @@ public class Sprite {
     }
 
     public Rectangle getBounds() {
-        return new Rectangle(this.x, this.y, this.width, this.height);
+        return new Rectangle(this.getX(), this.getY(), this.width, this.height);
     }
 }

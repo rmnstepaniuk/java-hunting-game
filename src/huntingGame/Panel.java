@@ -30,8 +30,7 @@ public class Panel extends JPanel implements ActionListener {
         setFocusable(true);
         inGame = true;
 
-        player = new Player(Main.SCREEN_WIDTH / 2, Main.SCREEN_HEIGHT / 2);
-
+        player = new Player(20, 20);
         initEntities();
 
         int DELAY = 10;
@@ -49,7 +48,7 @@ public class Panel extends JPanel implements ActionListener {
         while (deerPopulation < 3) {
             deerPopulation = random.nextInt(10);
         }
-        agents.addAll(Spawner.spawnDeer(deerPopulation));
+        agents.addAll(Spawner.spawnDeer(2));
     }
 
     @Override
@@ -125,6 +124,7 @@ public class Panel extends JPanel implements ActionListener {
     private void checkCollision() {
         Rectangle playerHitBox = player.getBounds();
         Rectangle entityHitBox;
+        Rectangle agentHitBox;
         Rectangle bulletHitBox;
 
         for (Agent agent : agents) {
@@ -150,6 +150,25 @@ public class Panel extends JPanel implements ActionListener {
                 }
                 if (agent instanceof Hare) {
                     player.updateScore(1);
+                }
+            }
+            for (Agent agent1 : agents) {
+                agentHitBox = agent1.getBounds();
+                if (!agent.equals(agent1)) {
+                    if (entityHitBox.intersects(agentHitBox) && agent.isAlive() && agent1.isAlive()) {
+                        if (agent instanceof Wolf) {
+                            if (agent1 instanceof Hare){
+                                agent1.setAlive(false);
+                                agent1.setVisible(false);
+                                agent1.loadImage("res/entities/hareDead.png");
+                            }
+                            else if (agent1 instanceof Deer) {
+                                agent1.setAlive(false);
+                                agent1.setVisible(false);
+                                agent1.loadImage("res/entities/deerDead.png");
+                            }
+                         }
+                    }
                 }
             }
         }
@@ -179,6 +198,7 @@ public class Panel extends JPanel implements ActionListener {
 
     private void updateEntities() {
         Agent agent;
+        Sprite target;
         if (agents.size() == 0) {
             inGame = false;
             return;
@@ -187,7 +207,12 @@ public class Panel extends JPanel implements ActionListener {
             for (int i = 0; i < agents.size(); i++) {
                 agent = agents.get(i);
                 if (agent.isAlive()) {
-                    agent.move();
+                    agent.checkEdges();
+                    target = agent.findTarget((ArrayList<Agent>) agents, player);
+                    if (target == null) {
+                        target = player;
+                    }
+                    agent.update(target.getPosition());
                 }
                 if (!agent.isVisible()) {
                     agents.remove(i);

@@ -10,15 +10,17 @@ import static java.lang.Thread.sleep;
 
 public class Player extends Sprite {
 
-    private int dx, dy;
+    private double dx, dy;
     private List<Bullet> bullets;
     private int directionCode;
     private int ammo;
     private int score;
+    private double speed;
 
     public Player(int x, int y) {
         super(x, y);
         score = 0;
+        speed = 1.1;
         initPlayer();
     }
 
@@ -46,16 +48,17 @@ public class Player extends Sprite {
     }
 
     public void move() {
-        if (x == 0 || x == Main.SCREEN_WIDTH || y == 0 || y == Main.SCREEN_HEIGHT) {
+        if (this.getX() == 0 || this.getX() == Main.SCREEN_WIDTH ||
+            this.getY() == 0 || this.getY() == Main.SCREEN_HEIGHT) {
             setVisible(false);
         }
-        x += dx;
-        y += dy;
+        this.position.x += dx * speed;
+        this.position.y += dy * speed;
     }
 
     private void fire() {
         if (ammo > 0) {
-            bullets.add(new Bullet(x + dx, y + dy, this.directionCode));
+            bullets.add(new Bullet(this.getX() + (int) dx, this.getY() + (int) dy, this.directionCode));
             ammo--;
             try {
                 sleep(100);
