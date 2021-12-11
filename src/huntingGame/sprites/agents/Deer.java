@@ -5,7 +5,7 @@ public class Deer extends Agent {
     public Deer(int x, int y) {
         super(x, y);
         this.maxSpeed = 1.1;
-        this.viewRadius = 220;
+        this.viewRadius = 110;
         initDeer();
     }
 

@@ -5,7 +5,7 @@ public class Hare extends Agent {
     public Hare(int x, int y) {
         super(x, y);
         this.maxSpeed = 1.05;
-        this.viewRadius = 200;
+        this.viewRadius = 100;
         initHare();
     }
 

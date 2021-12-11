@@ -40,15 +40,15 @@ public class Panel extends JPanel implements ActionListener {
 
     private void initEntities() {
         agents = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 5; i++) {
             agents.add(Spawner.spawnWolf());
             agents.add(Spawner.spawnHare());
         }
-//        int deerPopulation = 0;
-//        while (deerPopulation < 3) {
-//            deerPopulation = random.nextInt(10);
-//        }
-//        agents.addAll(Spawner.spawnDeer(2));
+        int deerPopulation = 0;
+        while (deerPopulation < 3) {
+            deerPopulation = random.nextInt(10);
+        }
+        agents.addAll(Spawner.spawnDeer(deerPopulation));
     }
 
     @Override
@@ -201,7 +201,6 @@ public class Panel extends JPanel implements ActionListener {
         Sprite target;
         if (agents.size() == 0) {
             inGame = false;
-            return;
         }
         else {
             for (int i = 0; i < agents.size(); i++) {
@@ -209,10 +208,8 @@ public class Panel extends JPanel implements ActionListener {
                 if (agent.isAlive()) {
                     agent.checkEdges();
                     target = agent.findTarget((ArrayList<Agent>) agents, player);
-                    if (target == null) {
-                        target = player;
-                    }
-                    agent.update(target.getPosition());
+                    agent.update(target);
+
                 }
                 if (!agent.isVisible()) {
                     agents.remove(i);

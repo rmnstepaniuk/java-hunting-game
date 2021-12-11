@@ -13,11 +13,11 @@ public class Spawner {
     private Spawner() {}
 
     public static Wolf spawnWolf() {
-        return new Wolf(random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_HEIGHT));
+        return new Wolf(random.nextInt(SCREEN_WIDTH - 50), random.nextInt(SCREEN_HEIGHT - 50));
     }
 
     public static Hare spawnHare() {
-        return new Hare(random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_HEIGHT));
+        return new Hare(random.nextInt(SCREEN_WIDTH - 50), random.nextInt(SCREEN_HEIGHT - 50));
     }
     public static List<Deer> spawnDeer(int quantity) {
         int n = 16 + 3;
