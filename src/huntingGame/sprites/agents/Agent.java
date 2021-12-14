@@ -70,18 +70,31 @@ public class Agent extends Sprite {
         wanderVector.normalize();
         wanderVector.scale(wanderRadius);
 
-        wanderAngle += this.velocity.angle(wanderVector);
+        this.wanderAngle += this.velocity.angle(wanderVector);
 
         Vector2d displacement = new Vector2d(0, -1);
         displacement.scale(wanderRadius);
-        rotateVector(displacement, wanderAngle);
+        rotateVector(displacement, this.wanderAngle);
 
         double ANGLE_CHANGE = Math.PI / 9;
-        wanderAngle += (Math.random() * ANGLE_CHANGE) - ANGLE_CHANGE * .5;
+        this.wanderAngle += (Math.random() * ANGLE_CHANGE) - ANGLE_CHANGE * .5;
 
-        Vector2d wanderForce = new Vector2d();
-        wanderForce.add(wanderVector, displacement);
-        applyForce(wanderForce);
+        this.steerForce.add(wanderVector, displacement);
+        applyForce(this.steerForce);
+    }
+
+    private void contain() {
+        Vector2d desired;
+        if (this.position.x < 25 || this.position.x > Main.SCREEN_WIDTH - this.width - 25) {
+            desired = new Vector2d(-this.velocity.x, this.velocity.y);
+            this.steerForce.sub(desired, this.velocity);
+            applyForce(steerForce);
+        }
+        if (this.position.y < 25 || this.position.y > Main.SCREEN_HEIGHT - this.width - 25) {
+            desired = new Vector2d(this.velocity.x, -this.velocity.y);
+            this.steerForce.sub(desired, this.velocity);
+            applyForce(steerForce);
+        }
     }
 
     public void update(Sprite target) {
@@ -96,6 +109,9 @@ public class Agent extends Sprite {
             case "WANDER":
                 wander();
                 break;
+            case "CONTAIN":
+                contain();
+                break;
             default:
                 break;
         }
@@ -107,47 +123,9 @@ public class Agent extends Sprite {
         this.position.add(this.velocity, this.position);
     }
 
-    public void checkEdges() {
-        if (this.position.x < 32) {
-            if (this.position.x < -16) {
-                this.setAlive(false);
-                this.setVisible(false);
-            } else {
-                desiredVelocity = new Vector2d(this.velocity.x * maxSpeed, -this.velocity.y);
-                steerForce.sub(desiredVelocity, velocity);
-                applyForce(steerForce);
-            }
-        }
-        if (this.position.y < 32) {
-            if (this.position.y < -16) {
-                this.setAlive(false);
-                this.setVisible(false);
-            } else {
-                desiredVelocity = new Vector2d(-this.position.x, this.velocity.y * this.maxSpeed);
-                steerForce.sub(desiredVelocity, velocity);
-                applyForce(steerForce);
-            }
-        }
-        if (this.position.x > Main.SCREEN_WIDTH - 32) {
-            if (this.position.y > Main.SCREEN_WIDTH) {
-                this.setAlive(false);
-                this.setVisible(false);
-            } else {
-                this.desiredVelocity = new Vector2d(this.velocity.x * this.maxSpeed, -this.velocity.y);
-                this.steerForce.sub(this.desiredVelocity, this.velocity);
-                applyForce(this.steerForce);
-            }
-        }
-        if (this.position.y > Main.SCREEN_HEIGHT - 32) {
-            if (this.position.y > Main.SCREEN_HEIGHT) {
-                this.setAlive(false);
-                this.setVisible(false);
-            } else {
-                this.desiredVelocity = new Vector2d(-this.velocity.x, this.velocity.y * this.maxSpeed);
-                this.steerForce.sub(this.desiredVelocity, this.velocity);
-                applyForce(this.steerForce);
-            }
-        }
+    public boolean closeToEdges() {
+        return this.position.x < 25 || this.position.x > Main.SCREEN_WIDTH - this.width - 25 ||
+                this.position.y < 25 || this.position.y > Main.SCREEN_HEIGHT - this.width - 25;
     }
 
     public Sprite findTarget(ArrayList<Agent> agents, Player player) {
@@ -176,12 +154,26 @@ public class Agent extends Sprite {
     }
 
     private void chooseBehavior(Sprite target) {
-        if (target == null) this.behavior = "WANDER";
-        else {
-            if (this instanceof Hare || this instanceof Deer) this.behavior = "FLEE";
-            if (this instanceof Wolf) this.behavior = "SEEK";
-
-
+        if (this instanceof Wolf) {
+            if (target == null) {
+                if (this.closeToEdges()) this.behavior = "CONTAIN";
+                else this.behavior = "WANDER";
+            }
+            else this.behavior = "SEEK";
+        }
+        if (this instanceof Hare) {
+            if (target == null) {
+                if (this.closeToEdges()) this.behavior = "CONTAIN";
+                else this.behavior = "WANDER";
+            }
+            else this.behavior = "FLEE";
+        }
+        if (this instanceof Deer) {
+            if (target == null) {
+                if (this.closeToEdges()) this.behavior = "CONTAIN";
+                else this.behavior = "WANDER";
+            }
+            else this.behavior = "FLEE";
         }
     }
 

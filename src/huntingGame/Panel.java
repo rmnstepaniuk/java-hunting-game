@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Random;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import javax.swing.text.html.parser.Entity;
 
 
 public class Panel extends JPanel implements ActionListener {
@@ -44,11 +45,11 @@ public class Panel extends JPanel implements ActionListener {
             agents.add(Spawner.spawnWolf());
             agents.add(Spawner.spawnHare());
         }
-//        int deerPopulation = 0;
-//        while (deerPopulation < 3) {
-//            deerPopulation = random.nextInt(10);
-//        }
-//        agents.addAll(Spawner.spawnDeer(deerPopulation));
+        int deerPopulation = 0;
+        while (deerPopulation < 3) {
+            deerPopulation = random.nextInt(10);
+        }
+        agents.addAll(Spawner.spawnDeer(deerPopulation));
     }
 
     @Override
@@ -196,6 +197,14 @@ public class Panel extends JPanel implements ActionListener {
         }
     }
 
+    private void checkEdges(Sprite sprite) {
+        if ((sprite.getX() < 0) || (sprite.getX() > Main.SCREEN_WIDTH) ||
+                (sprite.getY() < 0) || (sprite.getY() > Main.SCREEN_HEIGHT)) {
+            if (sprite instanceof Agent) ((Agent) sprite).setAlive(false);
+            sprite.setVisible(false);
+        }
+    }
+
     private void updateEntities() {
         Agent agent;
         Sprite target;
@@ -206,10 +215,9 @@ public class Panel extends JPanel implements ActionListener {
             for (int i = 0; i < agents.size(); i++) {
                 agent = agents.get(i);
                 if (agent.isAlive()) {
-                    agent.checkEdges();
+                    checkEdges(agent);
                     target = agent.findTarget((ArrayList<Agent>) agents, player);
                     agent.update(target);
-
                 }
                 if (!agent.isVisible()) {
                     agents.remove(i);
