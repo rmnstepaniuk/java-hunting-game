@@ -40,25 +40,48 @@ public class Agent extends Sprite {
     }
 
     private void applyForce(Vector2d force) {
-        this.acceleration.add(force);
+        this.acceleration.setX(force.getX());
+        this.acceleration.setY(force.getY());
     }
 
     private void seek(Vector2d targetPosition) {
-        desiredVelocity.sub(targetPosition, position);
-        desiredVelocity.normalize();
-        desiredVelocity.scale(maxSpeed);
-        steerForce.sub(desiredVelocity, velocity);
+        this.desiredVelocity.sub(targetPosition, this.position);
+        this.desiredVelocity.normalize();
+        this.desiredVelocity.scale(this.maxSpeed);
+        this.steerForce.sub(this.desiredVelocity, this.velocity);
 
-        applyForce(steerForce);
+        applyForce(this.steerForce);
     }
 
     private void flee(Vector2d targetPosition) {
-        desiredVelocity.sub(position, targetPosition);
+        this.desiredVelocity.sub(this.position, targetPosition);
 
-        desiredVelocity.normalize();
-        desiredVelocity.scale(maxSpeed);
-        steerForce.sub(desiredVelocity, velocity);
-        applyForce(steerForce);
+        this.desiredVelocity.normalize();
+        this.desiredVelocity.scale(this.maxSpeed);
+        this.steerForce.sub(this.desiredVelocity, this.velocity);
+        applyForce(this.steerForce);
+    }
+
+    private void wander() {
+
+        int wanderRadius = 10;
+
+        Vector2d wanderVector = (Vector2d) this.velocity.clone();
+        wanderVector.normalize();
+        wanderVector.scale(wanderRadius);
+
+        wanderAngle += this.velocity.angle(wanderVector);
+
+        Vector2d displacement = new Vector2d(0, -1);
+        displacement.scale(wanderRadius);
+        rotateVector(displacement, wanderAngle);
+
+        double ANGLE_CHANGE = Math.PI / 9;
+        wanderAngle += (Math.random() * ANGLE_CHANGE) - ANGLE_CHANGE * .5;
+
+        Vector2d wanderForce = new Vector2d();
+        wanderForce.add(wanderVector, displacement);
+        applyForce(wanderForce);
     }
 
     public void update(Sprite target) {
@@ -76,71 +99,53 @@ public class Agent extends Sprite {
             default:
                 break;
         }
-        velocity.add(acceleration);
-        velocity.scale(maxSpeed);
-        position.add(velocity, position);
-        acceleration.scale(0);
-    }
-
-    private void wander() {
-
-        int circleRadius = 10;
-
-        Vector2d circleCenter = (Vector2d) this.velocity.clone();
-        circleCenter.normalize();
-        circleCenter.scale(circleRadius);
-        System.out.println(circleCenter);
-
-        Vector2d displacement = new Vector2d(0, -1);
-        displacement.scale(circleRadius);
-        rotateVector(displacement, wanderAngle);
-        System.out.println(displacement);
-
-        double ANGLE_CHANGE = Math.PI / 12;
-        wanderAngle += (Math.random() * ANGLE_CHANGE) - ANGLE_CHANGE * .5;
-
-        Vector2d wanderForce = new Vector2d();
-        wanderForce.add(circleCenter, displacement);
-        this.seek(wanderForce);
-
-        this.velocity = new Vector2d(0, 0);
+        this.velocity.add(this.acceleration);
+        if (this.velocity.length() > this.maxSpeed) {
+            this.velocity.normalize();
+            this.velocity.scale(this.maxSpeed);
+        }
+        this.position.add(this.velocity, this.position);
     }
 
     public void checkEdges() {
-        if (this.position.x < 0) {
-            desiredVelocity = new Vector2d(this.maxSpeed, -this.velocity.y);
-            steerForce.sub(desiredVelocity, velocity);
-            applyForce(steerForce);
+        if (this.position.x < 32) {
             if (this.position.x < -16) {
                 this.setAlive(false);
                 this.setVisible(false);
+            } else {
+                desiredVelocity = new Vector2d(this.velocity.x * maxSpeed, -this.velocity.y);
+                steerForce.sub(desiredVelocity, velocity);
+                applyForce(steerForce);
             }
         }
-        if (this.position.y < 0) {
-            desiredVelocity = new Vector2d(-this.position.x, this.maxSpeed);
-            steerForce.sub(desiredVelocity, velocity);
-            applyForce(steerForce);
+        if (this.position.y < 32) {
             if (this.position.y < -16) {
                 this.setAlive(false);
-               this.setVisible(false);
+                this.setVisible(false);
+            } else {
+                desiredVelocity = new Vector2d(-this.position.x, this.velocity.y * this.maxSpeed);
+                steerForce.sub(desiredVelocity, velocity);
+                applyForce(steerForce);
             }
         }
-        if (this.position.x > Main.SCREEN_WIDTH - 16) {
-            desiredVelocity = new Vector2d(this.maxSpeed, this.velocity.y);
-            steerForce.sub(desiredVelocity, velocity);
-            applyForce(steerForce);
+        if (this.position.x > Main.SCREEN_WIDTH - 32) {
             if (this.position.y > Main.SCREEN_WIDTH) {
                 this.setAlive(false);
                 this.setVisible(false);
+            } else {
+                this.desiredVelocity = new Vector2d(this.velocity.x * this.maxSpeed, -this.velocity.y);
+                this.steerForce.sub(this.desiredVelocity, this.velocity);
+                applyForce(this.steerForce);
             }
         }
-        if (this.position.y > Main.SCREEN_HEIGHT - 16) {
-            desiredVelocity = new Vector2d(this.velocity.x, this.maxSpeed);
-            steerForce.sub(desiredVelocity, velocity);
-            applyForce(steerForce);
+        if (this.position.y > Main.SCREEN_HEIGHT - 32) {
             if (this.position.y > Main.SCREEN_HEIGHT) {
                 this.setAlive(false);
                 this.setVisible(false);
+            } else {
+                this.desiredVelocity = new Vector2d(-this.velocity.x, this.velocity.y * this.maxSpeed);
+                this.steerForce.sub(this.desiredVelocity, this.velocity);
+                applyForce(this.steerForce);
             }
         }
     }
