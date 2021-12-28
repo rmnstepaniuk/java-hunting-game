@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Random;
 import javax.swing.JPanel;
 import javax.swing.Timer;
-import javax.swing.text.html.parser.Entity;
-
 
 public class Panel extends JPanel implements ActionListener {
 
